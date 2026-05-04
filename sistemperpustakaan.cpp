@@ -111,3 +111,79 @@ void loadBuku() {
         else           { b->prev = tailBuku; tailBuku->next = b; tailBuku = b; }
     }
 }
+
+// ============================================================
+//  FILE I/O — ANGGOTA
+// ============================================================
+
+void simpanAnggota() {
+    ofstream f("data_anggota.txt");
+    for (Anggota *p = headAnggota; p; p = p->next)
+        f << p->id << "|" << p->nama << "|" << p->alamat << "\n";
+}
+
+void loadAnggota() {
+    ifstream f("data_anggota.txt");
+    if (!f) return;
+
+    string line;
+    while (getline(f, line)) {
+        line = trim(line);
+        if (line.empty()) continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        if (p1 == string::npos || p2 == string::npos) continue;
+
+        Anggota *a = new Anggota();
+        a->id      = trim(line.substr(0, p1));
+        a->nama    = trim(line.substr(p1 + 1, p2 - p1 - 1));
+        a->alamat  = trim(line.substr(p2 + 1));
+        a->prev    = a->next = nullptr;
+
+        if (!headAnggota) { headAnggota = tailAnggota = a; }
+        else              { a->prev = tailAnggota; tailAnggota->next = a; tailAnggota = a; }
+    }
+}
+
+// ============================================================
+//  FILE I/O — TRANSAKSI
+// ============================================================
+
+void simpanTransaksi() {
+    ofstream f("data_transaksi.txt");
+    for (Transaksi *p = headTransaksi; p; p = p->next)
+        f << p->idTransaksi   << "|" << p->idAnggota      << "|" << p->idBuku         << "|"
+          << p->tanggalPinjam << "|" << p->tanggalKembali << "|" << (p->sudahKembali ? "1" : "0") << "\n";
+}
+
+void loadTransaksi() {
+    ifstream f("data_transaksi.txt");
+    if (!f) return;
+
+    string line;
+    while (getline(f, line)) {
+        line = trim(line);
+        if (line.empty()) continue;
+
+        size_t p1 = line.find('|');
+        size_t p2 = line.find('|', p1 + 1);
+        size_t p3 = line.find('|', p2 + 1);
+        size_t p4 = line.find('|', p3 + 1);
+        size_t p5 = line.find('|', p4 + 1);
+        if (p1 == string::npos || p2 == string::npos || p3 == string::npos ||
+            p4 == string::npos || p5 == string::npos) continue;
+
+        Transaksi *t      = new Transaksi();
+        t->idTransaksi    = trim(line.substr(0,       p1));
+        t->idAnggota      = trim(line.substr(p1 + 1,  p2 - p1 - 1));
+        t->idBuku         = trim(line.substr(p2 + 1,  p3 - p2 - 1));
+        t->tanggalPinjam  = trim(line.substr(p3 + 1,  p4 - p3 - 1));
+        t->tanggalKembali = trim(line.substr(p4 + 1,  p5 - p4 - 1));
+        t->sudahKembali   = (trim(line.substr(p5 + 1)) == "1");
+        t->prev           = t->next = nullptr;
+
+        if (!headTransaksi) { headTransaksi = tailTransaksi = t; }
+        else                { t->prev = tailTransaksi; tailTransaksi->next = t; tailTransaksi = t; }
+    }
+}
