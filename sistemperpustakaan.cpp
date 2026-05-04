@@ -187,3 +187,81 @@ void loadTransaksi() {
         else                { t->prev = tailTransaksi; tailTransaksi->next = t; tailTransaksi = t; }
     }
 }
+
+/ ============================================================
+//  TABEL — BUKU
+// ============================================================
+
+void tampilTabelBuku() {
+    const int W = 70;
+    int wID = 2, wJudul = 5, wPenulis = 7, wTahun = 5;
+
+    for (Buku *p = headBuku; p; p = p->next) {
+        if ((int)p->id.size()      > wID)      wID      = p->id.size();
+        if ((int)p->judul.size()   > wJudul)   wJudul   = p->judul.size();
+        if ((int)p->penulis.size() > wPenulis) wPenulis = p->penulis.size();
+    }
+
+    wID += 3; wJudul += 3; wPenulis += 3; wTahun += 3;
+
+    int sisa = W - (2 + wID + wJudul + wPenulis + wTahun);
+    if (sisa > 0) { wJudul += sisa / 2; wPenulis += sisa - sisa / 2; }
+
+    int total = 2 + wID + wJudul + wPenulis + wTahun;
+
+    cout << left
+         << "  " << setw(wID)      << "ID"
+         <<        setw(wJudul)    << "JUDUL"
+         <<        setw(wPenulis)  << "PENULIS"
+         <<        setw(wTahun)    << "TAHUN" << "\n";
+    garis('-', total);
+
+    bool ada = false;
+    for (Buku *p = headBuku; p; p = p->next) {
+        ada = true;
+        cout << "  " << setw(wID)     << p->id
+             <<        setw(wJudul)   << p->judul
+             <<        setw(wPenulis) << p->penulis
+             <<        setw(wTahun)   << p->tahun << "\n";
+    }
+    if (!ada) cout << "  [Data buku kosong]\n";
+    garis('=', total);
+}
+
+// ============================================================
+//  TABEL — ANGGOTA
+// ============================================================
+
+void tampilTabelAnggota() {
+    const int W = 70;
+    int wID = 2, wNama = 4, wAlamat = 6;
+
+    for (Anggota *p = headAnggota; p; p = p->next) {
+        if ((int)p->id.size()     > wID)     wID     = p->id.size();
+        if ((int)p->nama.size()   > wNama)   wNama   = p->nama.size();
+        if ((int)p->alamat.size() > wAlamat) wAlamat = p->alamat.size();
+    }
+
+    wID += 3; wNama += 3; wAlamat += 3;
+
+    int sisa = W - (2 + wID + wNama + wAlamat);
+    if (sisa > 0) { wNama += sisa / 2; wAlamat += sisa - sisa / 2; }
+
+    int total = 2 + wID + wNama + wAlamat;
+
+    cout << left
+         << "  " << setw(wID)     << "ID"
+         <<        setw(wNama)    << "NAMA"
+         <<        setw(wAlamat)  << "ALAMAT" << "\n";
+    garis('-', total);
+
+    bool ada = false;
+    for (Anggota *p = headAnggota; p; p = p->next) {
+        ada = true;
+        cout << "  " << setw(wID)    << p->id
+             <<        setw(wNama)   << p->nama
+             <<        setw(wAlamat) << p->alamat << "\n";
+    }
+    if (!ada) cout << "  [Data anggota kosong]\n";
+    garis('=', total);
+}
