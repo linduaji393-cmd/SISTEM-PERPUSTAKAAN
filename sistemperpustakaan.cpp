@@ -265,3 +265,124 @@ void tampilTabelAnggota() {
     if (!ada) cout << "  [Data anggota kosong]\n";
     garis('=', total);
 }
+
+// ============================================================
+//  TABEL — TRANSAKSI
+// ============================================================
+
+void tampilTabelTransaksi() {
+    const int W = 70;
+    int wTrx = 6, wAng = 7, wBuku = 4, wPinjam = 10, wKembali = 11, wStatus = 8;
+
+    for (Transaksi *p = headTransaksi; p; p = p->next) {
+        if ((int)p->idTransaksi.size()    > wTrx)     wTrx    = p->idTransaksi.size();
+        if ((int)p->idAnggota.size()      > wAng)     wAng    = p->idAnggota.size();
+        if ((int)p->idBuku.size()         > wBuku)    wBuku   = p->idBuku.size();
+        if ((int)p->tanggalPinjam.size()  > wPinjam)  wPinjam = p->tanggalPinjam.size();
+        if ((int)p->tanggalKembali.size() > wKembali) wKembali= p->tanggalKembali.size();
+    }
+
+    wTrx += 3; wAng += 3; wBuku += 3; wPinjam += 3; wKembali += 3; wStatus += 2;
+
+    int sisa = W - (2 + wTrx + wAng + wBuku + wPinjam + wKembali + wStatus);
+    if (sisa > 0) { wPinjam += sisa / 2; wKembali += sisa - sisa / 2; }
+
+    int total = 2 + wTrx + wAng + wBuku + wPinjam + wKembali + wStatus;
+
+    cout << left
+         << "  " << setw(wTrx)   << "ID TRX"
+         <<        setw(wAng)    << "ANGGOTA"
+         <<        setw(wBuku)   << "BUKU"
+         <<        tengahKolom("TGL PINJAM",  wPinjam)
+         <<        tengahKolom("TGL KEMBALI", wKembali)
+         <<        setw(wStatus) << "STATUS" << "\n";
+    garis('-', total);
+
+    bool ada = false;
+    for (Transaksi *p = headTransaksi; p; p = p->next) {
+        ada = true;
+        cout << "  " << setw(wTrx)   << p->idTransaksi
+             <<        setw(wAng)    << p->idAnggota
+             <<        setw(wBuku)   << p->idBuku
+             <<        tengahKolom(p->tanggalPinjam,  wPinjam)
+             <<        tengahKolom(p->tanggalKembali, wKembali)
+             <<        setw(wStatus) << (p->sudahKembali ? "Selesai" : "Dipinjam") << "\n";
+    }
+    if (!ada) cout << "  [Data transaksi kosong]\n";
+    garis('=', total);
+}
+
+// ============================================================
+//  CRUD — BUKU
+// ============================================================
+
+void inputBuku() {
+    char lagi;
+    do {
+        header("INPUT DATA BUKU");
+        Buku *b = new Buku();
+        b->prev = b->next = nullptr;
+
+        cout << "  ID Buku     : "; cin >> b->id; cin.ignore();
+        cout << "  Judul Buku  : "; getline(cin, b->judul);
+        cout << "  Penulis     : "; getline(cin, b->penulis);
+        cout << "  Tahun       : "; cin >> b->tahun; cin.ignore();
+
+        if (!headBuku) { headBuku = tailBuku = b; }
+        else           { b->prev = tailBuku; tailBuku->next = b; tailBuku = b; }
+
+        simpanBuku();
+        notif("DATA BERHASIL DITAMBAHKAN");
+
+        header("TAMBAH DATA LAGI?", '-');
+        cout << "  [y] Ya, tambah lagi\n  [t] Kembali ke menu\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> lagi;
+    } while (lagi == 'y' || lagi == 'Y');
+}
+
+void tampilDataBuku() {
+    char ulang;
+    do {
+        header("DATA BUKU");
+        tampilTabelBuku();
+        header("TAMPILKAN LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
+
+void cariBuku() {
+    char ulang;
+    do {
+        header("PENCARIAN BUKU");
+        header("CARI BERDASARKAN", '-');
+        cout << "  1. ID Buku\n  2. Judul Buku\n";
+        garis('-');
+        int pilih; cout << "Pilih : "; cin >> pilih; cin.ignore();
+
+        cout << "Masukkan kata kunci : ";
+        string kw; getline(cin, kw); kw = trim(kw);
+
+        bool ketemu = false;
+        for (Buku *p = headBuku; p; p = p->next) {
+            bool cocok = (pilih == 1 && p->id == kw) || (pilih == 2 && p->judul == kw);
+            if (cocok) {
+                header("DATA DITEMUKAN");
+                cout << "  " << left << setw(10) << "ID"      << ": " << p->id      << "\n";
+                cout << "  " << left << setw(10) << "Judul"   << ": " << p->judul   << "\n";
+                cout << "  " << left << setw(10) << "Penulis" << ": " << p->penulis << "\n";
+                cout << "  " << left << setw(10) << "Tahun"   << ": " << p->tahun   << "\n";
+                garis();
+                ketemu = true;
+            }
+        }
+        if (!ketemu) notif("DATA TIDAK DITEMUKAN");
+
+        header("CARI LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
