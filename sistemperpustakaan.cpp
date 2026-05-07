@@ -386,3 +386,80 @@ void cariBuku() {
         cout << "Pilih (y/t) : "; cin >> ulang;
     } while (ulang == 'y' || ulang == 'Y');
 }
+
+d editBuku() {
+    char ulang;
+    do {
+        header("EDIT BUKU");
+        cout << "Masukkan ID Buku : ";
+        string id; cin >> id; cin.ignore(); id = trim(id);
+
+        bool ketemu = false;
+        for (Buku *p = headBuku; p; p = p->next) {
+            if (p->id == id) {
+                header("DATA DITEMUKAN");
+                cout << "  Judul   : " << p->judul   << "\n";
+                cout << "  Penulis : " << p->penulis << "\n";
+                cout << "  Tahun   : " << p->tahun   << "\n";
+
+                header("MASUKKAN DATA BARU", '-');
+                cout << "  Judul Baru   : "; getline(cin, p->judul);
+                cout << "  Penulis Baru : "; getline(cin, p->penulis);
+                cout << "  Tahun Baru   : "; cin >> p->tahun; cin.ignore();
+
+                simpanBuku();
+                notif("DATA BERHASIL DIUPDATE");
+                ketemu = true;
+                break;
+            }
+        }
+        if (!ketemu) notif("DATA TIDAK DITEMUKAN");
+
+        header("EDIT LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
+
+void hapusBuku() {
+    char ulang;
+    do {
+        header("HAPUS BUKU");
+        cout << "Masukkan ID : ";
+        string id; cin >> id; id = trim(id);
+
+        bool ketemu = false;
+        for (Buku *p = headBuku; p; p = p->next) {
+            if (p->id == id) {
+                ketemu = true;
+                header("DATA DITEMUKAN");
+                cout << "  ID    : " << p->id    << "\n";
+                cout << "  Judul : " << p->judul << "\n";
+                cout << "  Tahun : " << p->tahun << "\n";
+
+                header("YAKIN INGIN MENGHAPUS?", '-');
+                cout << "  [y] Ya, hapus\n  [t] Batalkan\n";
+                garis('-');
+                char k; cout << "Pilih (y/t) : "; cin >> k;
+
+                if (k == 'y' || k == 'Y') {
+                    if (p->prev) p->prev->next = p->next; else headBuku = p->next;
+                    if (p->next) p->next->prev = p->prev; else tailBuku = p->prev;
+                    delete p;
+                    simpanBuku();
+                    notif("DATA BERHASIL DIHAPUS");
+                } else {
+                    notif("PENGHAPUSAN DIBATALKAN");
+                }
+                break;
+            }
+        }
+        if (!ketemu) notif("DATA TIDAK DITEMUKAN");
+
+        header("HAPUS LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
