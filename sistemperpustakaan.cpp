@@ -463,3 +463,140 @@ void hapusBuku() {
         cout << "Pilih (y/t) : "; cin >> ulang;
     } while (ulang == 'y' || ulang == 'Y');
 }
+
+// ============================================================
+//  SORTING — BUKU
+// ============================================================
+
+int countBuku() {
+    int n = 0;
+    for (Buku *p = headBuku; p; p = p->next) n++;
+    return n;
+}
+
+void bukuKeArray(Buku **arr, int n) {
+    Buku *p = headBuku;
+    for (int i = 0; i < n; i++, p = p->next) arr[i] = p;
+}
+
+void arrayKeBuku(Buku **arr, int n) {
+    headBuku = arr[0]; tailBuku = arr[n - 1];
+    for (int i = 0; i < n; i++) {
+        arr[i]->prev = (i > 0)     ? arr[i - 1] : nullptr;
+        arr[i]->next = (i < n - 1) ? arr[i + 1] : nullptr;
+    }
+}
+
+bool lebihBesar(Buku *a, Buku *b, int field, bool asc) {
+    if (field == 1) return asc ? a->judul > b->judul : a->judul < b->judul;
+    if (field == 2) return asc ? a->id    > b->id    : a->id    < b->id;
+    if (field == 3) return asc ? a->tahun > b->tahun : a->tahun < b->tahun;
+    return false;
+}
+
+void bubbleSort(Buku **arr, int n, int f, bool asc) {
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (lebihBesar(arr[j], arr[j + 1], f, asc)) swap(arr[j], arr[j + 1]);
+}
+
+void selectionSort(Buku **arr, int n, int f, bool asc) {
+    for (int i = 0; i < n - 1; i++) {
+        int idx = i;
+        for (int j = i + 1; j < n; j++)
+            if (lebihBesar(arr[idx], arr[j], f, asc)) idx = j;
+        if (idx != i) swap(arr[i], arr[idx]);
+    }
+}
+
+void insertionSort(Buku **arr, int n, int f, bool asc) {
+    for (int i = 1; i < n; i++) {
+        Buku *key = arr[i];
+        int   j   = i - 1;
+        while (j >= 0 && lebihBesar(arr[j], key, f, asc)) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+void shellSort(Buku **arr, int n, int f, bool asc) {
+    for (int gap = n / 2; gap > 0; gap /= 2)
+        for (int i = gap; i < n; i++) {
+            Buku *tmp = arr[i];
+            int   j   = i;
+            while (j >= gap && lebihBesar(arr[j - gap], tmp, f, asc)) {
+                arr[j] = arr[j - gap];
+                j     -= gap;
+            }
+            arr[j] = tmp;
+        }
+}
+
+void sortingBuku() {
+    char ulang;
+    do {
+        header("SORTING BUKU");
+        int n = countBuku();
+        if (n == 0) { notif("DATA BUKU KOSONG"); break; }
+
+        header("PILIH ALGORITMA SORTING", '-');
+        cout << "  1. Bubble Sort\n  2. Selection Sort\n  3. Insertion Sort\n  4. Shell Sort\n";
+        garis('-');
+        int pilihAlgo; cout << "Pilih : "; cin >> pilihAlgo;
+        if (pilihAlgo < 1 || pilihAlgo > 4) { notif("PILIHAN TIDAK VALID"); continue; }
+
+        header("URUTKAN BERDASARKAN", '-');
+        cout << "  1. Judul Buku\n  2. ID Buku\n  3. Tahun\n";
+        garis('-');
+        int pilihField; cout << "Pilih : "; cin >> pilihField;
+        if (pilihField < 1 || pilihField > 3) { notif("PILIHAN TIDAK VALID"); continue; }
+
+        header("PILIH URUTAN", '-');
+        cout << "  1. Ascending  (A --> Z / Kecil --> Besar)\n";
+        cout << "  2. Descending (Z --> A / Besar --> Kecil)\n";
+        garis('-');
+        int pilihUrutan; cout << "Pilih : "; cin >> pilihUrutan;
+        if (pilihUrutan < 1 || pilihUrutan > 2) { notif("PILIHAN TIDAK VALID"); continue; }
+
+        bool asc   = (pilihUrutan == 1);
+        Buku **arr = new Buku*[n];
+        bukuKeArray(arr, n);
+
+        string namaAlgo, namaField;
+        switch (pilihAlgo) {
+            case 1: namaAlgo = "Bubble Sort";    bubbleSort   (arr, n, pilihField, asc); break;
+            case 2: namaAlgo = "Selection Sort"; selectionSort(arr, n, pilihField, asc); break;
+            case 3: namaAlgo = "Insertion Sort"; insertionSort(arr, n, pilihField, asc); break;
+            case 4: namaAlgo = "Shell Sort";     shellSort    (arr, n, pilihField, asc); break;
+        }
+        switch (pilihField) {
+            case 1: namaField = "Judul Buku"; break;
+            case 2: namaField = "ID Buku";    break;
+            case 3: namaField = "Tahun";      break;
+        }
+
+        string namaUrutan = asc ? "Ascending (A-->Z / Kecil-->Besar)"
+                                : "Descending (Z-->A / Besar-->Kecil)";
+        arrayKeBuku(arr, n);
+        delete[] arr;
+        simpanBuku();
+
+        header("DATA BERHASIL DIURUTKAN");
+        cout << "  Algoritma   : " << namaAlgo   << "\n";
+        cout << "  Berdasarkan : " << namaField  << "\n";
+        cout << "  Urutan      : " << namaUrutan << "\n";
+
+        header("TAMPILKAN HASIL SORTING?", '-');
+        cout << "  [y] Ya\n  [t] Tidak\n";
+        garis('-');
+        char tampil; cout << "Pilih (y/t) : "; cin >> tampil;
+        if (tampil == 'y' || tampil == 'Y') { header("HASIL SORTING"); tampilTabelBuku(); }
+
+        header("SORTING LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
