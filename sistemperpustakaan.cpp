@@ -600,3 +600,51 @@ void sortingBuku() {
         cout << "Pilih (y/t) : "; cin >> ulang;
     } while (ulang == 'y' || ulang == 'Y');
 }
+// ============================================================
+//  TRANSAKSI — PEMINJAMAN
+// ============================================================
+
+void pinjamBuku() {
+    char lagi;
+    do {
+        header("PEMINJAMAN BUKU");
+        header("DAFTAR BUKU TERSEDIA", '-');
+        tampilTabelBuku();
+        header("DAFTAR ANGGOTA", '-');
+        tampilTabelAnggota();
+
+        Transaksi *t    = new Transaksi();
+        t->prev         = t->next = nullptr;
+        t->sudahKembali = false;
+
+        cout << "  ID Transaksi    : "; cin >> t->idTransaksi; cin.ignore();
+        cout << "  ID Anggota      : "; cin >> t->idAnggota;   cin.ignore();
+        cout << "  ID Buku         : "; cin >> t->idBuku;      cin.ignore();
+        cout << "  Tanggal Pinjam  : "; getline(cin, t->tanggalPinjam);
+        t->tanggalKembali = "-";
+
+        bool anggotaAda = false, bukuAda = false;
+        for (Anggota *p = headAnggota; p; p = p->next)
+            if (p->id == trim(t->idAnggota)) { anggotaAda = true; break; }
+        for (Buku *p = headBuku; p; p = p->next)
+            if (p->id == trim(t->idBuku))    { bukuAda    = true; break; }
+
+        if (!anggotaAda) {
+            notif("ID ANGGOTA TIDAK DITEMUKAN - PEMINJAMAN DIBATALKAN");
+            delete t;
+        } else if (!bukuAda) {
+            notif("ID BUKU TIDAK DITEMUKAN - PEMINJAMAN DIBATALKAN");
+            delete t;
+        } else {
+            if (!headTransaksi) { headTransaksi = tailTransaksi = t; }
+            else                { t->prev = tailTransaksi; tailTransaksi->next = t; tailTransaksi = t; }
+            simpanTransaksi();
+            notif("PEMINJAMAN BERHASIL DICATAT");
+        }
+
+        header("TAMBAH PEMINJAMAN LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> lagi;
+    } while (lagi == 'y' || lagi == 'Y');
+}
