@@ -648,3 +648,73 @@ void pinjamBuku() {
         cout << "Pilih (y/t) : "; cin >> lagi;
     } while (lagi == 'y' || lagi == 'Y');
 }
+
+// ============================================================
+//  TRANSAKSI — PENGEMBALIAN
+// ============================================================
+
+void kembaliBuku() {
+    char ulang;
+    do {
+        header("PENGEMBALIAN BUKU");
+        cout << "  Masukkan ID Transaksi : ";
+        string idTrx; cin >> idTrx; cin.ignore(); idTrx = trim(idTrx);
+
+        bool ketemu = false;
+        for (Transaksi *p = headTransaksi; p; p = p->next) {
+            if (trim(p->idTransaksi) != idTrx) continue;
+
+            ketemu = true;
+            garis('-');
+
+            if (p->sudahKembali) {
+                header("STATUS TRANSAKSI");
+                cout << "  ID Transaksi  : " << p->idTransaksi    << "\n";
+                cout << "  ID Anggota    : " << p->idAnggota      << "\n";
+                cout << "  ID Buku       : " << p->idBuku         << "\n";
+                cout << "  Tgl Pinjam    : " << p->tanggalPinjam  << "\n";
+                cout << "  Tgl Kembali   : " << p->tanggalKembali << "\n";
+                garis('-');
+                notif("BUKU INI SUDAH DIKEMBALIKAN");
+            } else {
+                header("DATA PEMINJAMAN");
+                cout << "  ID Transaksi  : " << p->idTransaksi   << "\n";
+                cout << "  ID Anggota    : " << p->idAnggota     << "\n";
+                cout << "  ID Buku       : " << p->idBuku        << "\n";
+                cout << "  Tgl Pinjam    : " << p->tanggalPinjam << "\n";
+                garis('-');
+                cout << "  Tanggal Kembali : ";
+                getline(cin, p->tanggalKembali);
+                p->sudahKembali = true;
+                simpanTransaksi();
+
+                string judulBuku = "-", penulisBuku = "-";
+                for (Buku *b = headBuku; b; b = b->next)
+                    if (trim(b->id) == trim(p->idBuku)) {
+                        judulBuku   = b->judul;
+                        penulisBuku = b->penulis;
+                        break;
+                    }
+
+                garis('=');
+                judulTengah("TRANSAKSI PENGEMBALIAN BERHASIL");
+                garis('=');
+                cout << "  ID Transaksi  : " << p->idTransaksi    << "\n";
+                cout << "  ID Anggota    : " << p->idAnggota      << "\n";
+                cout << "  ID Buku       : " << p->idBuku         << "\n";
+                cout << "  Judul Buku    : " << judulBuku         << "\n";
+                cout << "  Penulis       : " << penulisBuku       << "\n";
+                cout << "  Tgl Pinjam    : " << p->tanggalPinjam  << "\n";
+                cout << "  Tgl Kembali   : " << p->tanggalKembali << "\n";
+                garis('=');
+            }
+            break;
+        }
+        if (!ketemu) notif("ID TRANSAKSI TIDAK DITEMUKAN");
+
+        garis('-');
+        cout << "  [y] Proses pengembalian lagi\n  [t] Kembali ke menu\n";
+        garis('-');
+        cout << "  Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
