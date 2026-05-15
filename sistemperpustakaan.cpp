@@ -67,7 +67,7 @@ void notif(const string& pesan, int lebar = 70) {
     garis('=', lebar);
 }
 
-/ Teks rata tengah dalam kolom dengan lebar tertentu
+// Teks rata tengah dalam kolom dengan lebar tertentu
 string tengahKolom(const string& s, int lebar) {
     int len = (int)s.size();
     if (len >= lebar) return s.substr(0, lebar);
@@ -188,7 +188,7 @@ void loadTransaksi() {
     }
 }
 
-/ ============================================================
+//============================================================
 //  TABEL — BUKU
 // ============================================================
 
@@ -600,6 +600,117 @@ void sortingBuku() {
         cout << "Pilih (y/t) : "; cin >> ulang;
     } while (ulang == 'y' || ulang == 'Y');
 }
+
+// ============================================================
+//  CRUD — ANGGOTA
+// ============================================================
+
+void inputAnggota() {
+    char lagi;
+    do {
+        header("INPUT DATA ANGGOTA");
+        Anggota *a = new Anggota();
+        a->prev = a->next = nullptr;
+
+        cout << "  ID Anggota : "; cin >> a->id; cin.ignore();
+        cout << "  Nama       : "; getline(cin, a->nama);
+        cout << "  Alamat     : "; getline(cin, a->alamat);
+
+        if (!headAnggota) { headAnggota = tailAnggota = a; }
+        else              { a->prev = tailAnggota; tailAnggota->next = a; tailAnggota = a; }
+
+        simpanAnggota();
+        notif("ANGGOTA BERHASIL DITAMBAHKAN");
+
+        header("TAMBAH LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> lagi;
+    } while (lagi == 'y' || lagi == 'Y');
+}
+
+void tampilAnggota() {
+    char ulang;
+    do {
+        header("DATA ANGGOTA");
+        tampilTabelAnggota();
+        header("TAMPILKAN LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
+
+void editAnggota() {
+    char ulang;
+    do {
+        header("EDIT ANGGOTA");
+        cout << "Masukkan ID Anggota : ";
+        string id; cin >> id; cin.ignore(); id = trim(id);
+
+        bool ketemu = false;
+        for (Anggota *p = headAnggota; p; p = p->next) {
+            if (p->id == id) {
+                cout << "  Nama   : " << p->nama   << "\n";
+                cout << "  Alamat : " << p->alamat << "\n";
+
+                header("MASUKKAN DATA BARU", '-');
+                cout << "  Nama Baru   : "; getline(cin, p->nama);
+                cout << "  Alamat Baru : "; getline(cin, p->alamat);
+
+                simpanAnggota();
+                notif("DATA ANGGOTA DIUPDATE");
+                ketemu = true;
+                break;
+            }
+        }
+        if (!ketemu) notif("ANGGOTA TIDAK DITEMUKAN");
+
+        header("EDIT LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
+
+void hapusAnggota() {
+    char ulang;
+    do {
+        header("HAPUS ANGGOTA");
+        cout << "Masukkan ID Anggota : ";
+        string id; cin >> id; id = trim(id);
+
+        bool ketemu = false;
+        for (Anggota *p = headAnggota; p; p = p->next) {
+            if (p->id == id) {
+                ketemu = true;
+                header("YAKIN HAPUS?", '-');
+                cout << "  " << p->id << " - " << p->nama << "\n";
+                cout << "  [y] Ya\n  [t] Tidak\n";
+                garis('-');
+                char k; cout << "Pilih (y/t) : "; cin >> k;
+
+                if (k == 'y' || k == 'Y') {
+                    if (p->prev) p->prev->next = p->next; else headAnggota = p->next;
+                    if (p->next) p->next->prev = p->prev; else tailAnggota = p->prev;
+                    delete p;
+                    simpanAnggota();
+                    notif("ANGGOTA DIHAPUS");
+                } else {
+                    notif("DIBATALKAN");
+                }
+                break;
+            }
+        }
+        if (!ketemu) notif("ANGGOTA TIDAK DITEMUKAN");
+
+        header("HAPUS LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
+        
 // ============================================================
 //  TRANSAKSI — PEMINJAMAN
 // ============================================================
@@ -718,3 +829,142 @@ void kembaliBuku() {
         cout << "  Pilih (y/t) : "; cin >> ulang;
     } while (ulang == 'y' || ulang == 'Y');
 }
+
+// ============================================================
+//  TRANSAKSI — RIWAYAT
+// ============================================================
+
+void riwayatTransaksi() {
+    char ulang;
+    do {
+        header("RIWAYAT TRANSAKSI");
+        tampilTabelTransaksi();
+        header("TAMPILKAN LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
+
+// ============================================================
+//  LAPORAN
+// ============================================================
+
+void laporan() {
+    char ulang;
+    do {
+        header("LAPORAN SISTEM PERPUSTAKAAN");
+
+        int totalBuku = 0, totalAnggota = 0, totalTrx = 0, masihDipinjam = 0;
+        for (Buku      *p = headBuku;      p; p = p->next) totalBuku++;
+        for (Anggota   *p = headAnggota;   p; p = p->next) totalAnggota++;
+        for (Transaksi *p = headTransaksi; p; p = p->next) {
+            totalTrx++;
+            if (!p->sudahKembali) masihDipinjam++;
+        }
+
+        cout << "  Total Buku           : " << totalBuku                  << "\n";
+        cout << "  Total Anggota        : " << totalAnggota               << "\n";
+        cout << "  Total Transaksi      : " << totalTrx                   << "\n";
+        cout << "  Buku Masih Dipinjam  : " << masihDipinjam              << "\n";
+        cout << "  Buku Sudah Kembali   : " << (totalTrx - masihDipinjam) << "\n";
+        garis();
+
+        if (masihDipinjam > 0) {
+            const int W = 70;
+            int wTrx = 6, wAng = 7, wBuku = 7, wPinjam = 10;
+
+            for (Transaksi *p = headTransaksi; p; p = p->next) {
+                if (!p->sudahKembali) {
+                    if ((int)p->idTransaksi.size()   > wTrx)   wTrx   = p->idTransaksi.size();
+                    if ((int)p->idAnggota.size()     > wAng)   wAng   = p->idAnggota.size();
+                    if ((int)p->idBuku.size()        > wBuku)  wBuku  = p->idBuku.size();
+                    if ((int)p->tanggalPinjam.size() > wPinjam)wPinjam= p->tanggalPinjam.size();
+                }
+            }
+
+            wTrx += 3; wAng += 3; wBuku += 3; wPinjam += 3;
+            int sisa = W - (2 + wTrx + wAng + wBuku + wPinjam);
+            if (sisa > 0) { wAng += sisa / 2; wPinjam += sisa - sisa / 2; }
+
+            int total = 2 + wTrx + wAng + wBuku + wPinjam;
+
+            header("DETAIL BUKU MASIH DIPINJAM", '-', total);
+            cout << left
+                 << "  " << setw(wTrx)  << "ID TRX"
+                 <<        setw(wAng)   << "ANGGOTA"
+                 <<        setw(wBuku)  << "ID BUKU"
+                 <<        tengahKolom("TGL PINJAM", wPinjam) << "\n";
+            garis('-', total);
+
+            for (Transaksi *p = headTransaksi; p; p = p->next) {
+                if (!p->sudahKembali)
+                    cout << "  " << setw(wTrx)  << p->idTransaksi
+                         <<        setw(wAng)   << p->idAnggota
+                         <<        setw(wBuku)  << p->idBuku
+                         <<        tengahKolom(p->tanggalPinjam, wPinjam) << "\n";
+            }
+            garis('=', total);
+        }
+
+        header("TAMPILKAN LAGI?", '-');
+        cout << "  [y] Ya\n  [t] Kembali\n";
+        garis('-');
+        cout << "Pilih (y/t) : "; cin >> ulang;
+    } while (ulang == 'y' || ulang == 'Y');
+}
+
+// ============================================================
+//  LOGIN
+// ============================================================
+
+bool login() {
+    string user, pass;
+    int percobaan = 0;
+
+    while (percobaan < 3) {
+        garis();
+        judulTengah("SISTEM INFORMASI PERPUSTAKAAN");
+        garis();
+        cout << "  Username : "; cin >> user;
+        cout << "  Password : "; cin >> pass;
+        garis();
+
+        if (user == "admin" && pass == "123") return true;
+
+        percobaan++;
+        notif("LOGIN GAGAL! (" + to_string(percobaan) + "/3)");
+    }
+    return false;
+}
+
+// ============================================================
+//  SUB-MENU ANGGOTA
+// ============================================================
+
+void menuAnggota() {
+    while (true) {
+        garis('-');
+        judulTengah("DATA ANGGOTA");
+        garis('-');
+        cout << "  01. Input Anggota\n";
+        cout << "  02. Tampil Anggota\n";
+        cout << "  03. Edit Anggota\n";
+        cout << "  04. Hapus Anggota\n";
+        garis('-');
+        cout << "  00. Kembali\n";
+        garis('-');
+
+        int pilih; cout << "Pilih : "; cin >> pilih;
+
+        switch (pilih) {
+            case 0:  return;
+            case 1:  inputAnggota(); break;
+            case 2:  tampilAnggota(); break;
+            case 3:  editAnggota(); break;
+            case 4:  hapusAnggota(); break;
+            default: notif("PILIHAN TIDAK VALID");
+        }
+    }
+}
+
