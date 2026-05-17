@@ -968,3 +968,35 @@ void menuAnggota() {
     }
 }
 
+// ============================================================
+//  MENU UTAMA
+// ============================================================
+
+void tampilMenuUtama() {
+    garis();
+    judulTengah("SISTEM INFORMASI PERPUSTAKAAN");
+    garis();
+    judulTengah("MENU UTAMA");
+    garis('-');
+    cout << "  01. Input Buku\n";
+    cout << "  02. Tampil Data Buku\n";
+    cout << "  03. Sorting Buku\n";
+    cout << "  04. Cari Buku\n";
+    cout << "  05. Edit Buku\n";
+    cout << "  06. Hapus Buku\n";
+    garis('-');
+    judulTengah("TRANSAKSI");
+    garis('-');
+    cout << "  07. Data Anggota\n";
+    cout << "  08. Peminjaman Buku\n";
+    cout << "  09. Pengembalian Buku\n";
+    cout << "  10. Riwayat Transaksi\n";
+    garis('-');
+    judulTengah("SISTEM");
+    garis('-');
+    cout << "  11. Laporan\n";
+    cout << "  12. Keluar\n";
+    garis();
+    cout << "Pilih Menu : ";
+}
+
