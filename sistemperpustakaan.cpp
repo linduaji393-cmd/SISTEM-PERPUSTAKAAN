@@ -1000,3 +1000,46 @@ void tampilMenuUtama() {
     cout << "Pilih Menu : ";
 }
 
+// ============================================================
+//  MAIN
+// ============================================================
+
+int main() {
+    loadBuku();
+    loadAnggota();
+    loadTransaksi();
+
+    if (!login()) {
+        header("AKSES DITOLAK");
+        cout << "  Anda telah 3x gagal login. Program dihentikan.\n";
+        garis();
+        return 0;
+    }
+    notif("LOGIN BERHASIL");
+
+    while (true) {
+        tampilMenuUtama();
+        int pilih; cin >> pilih;
+
+        switch (pilih) {
+            case 1:  inputBuku();        break;
+            case 2:  tampilDataBuku();   break;
+            case 3:  sortingBuku();      break;
+            case 4:  cariBuku();         break;
+            case 5:  editBuku();         break;
+            case 6:  hapusBuku();        break;
+            case 7:  menuAnggota();      break;
+            case 8:  pinjamBuku();       break;
+            case 9:  kembaliBuku();      break;
+            case 10: riwayatTransaksi(); break;
+            case 11: laporan();          break;
+            case 12:
+                header("TERIMA KASIH");
+                judulTengah("Sampai jumpa!");
+                garis();
+                return 0;
+            default:
+                notif("PILIHAN TIDAK VALID");
+        }
+    }
+}
